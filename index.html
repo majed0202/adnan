@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adnan | Star Rising</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1) الأساسيات والمتغيرات --- */
+        :root {
+            --bg-dark: #0a0f0d;
+            --pitch-green: #00ff66;
+            --pitch-green-glow: rgba(0, 255, 102, 0.4);
+            --text-light: #ffffff;
+            --text-gray: #a0a0a0;
+            --stadium-light: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* تخفيف تأثيرات الحركة لمن يفضل ذلك */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-delay: 0s !important;
+                animation-duration: 0s !important;
+                transition-duration: 0s !important;
+            }
+        }
+
+        /* --- 2) شاشة الانترو الافتتاحية (Intro) --- */
+        #intro {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: radial-gradient(circle at center, #111e16 0%, var(--bg-dark) 100%);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        /* تأثير إضاءة الملعب المسلطة */
+        .stadium-beam {
+            position: absolute;
+            top: -20%;
+            width: 300px;
+            height: 140vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+            clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%);
+            filter: blur(10px);
+            animation: beamPulse 2s infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes beamPulse {
+            0% { opacity: 0.6; transform: scaleX(0.9); }
+            100% { opacity: 1; transform: scaleX(1.1); }
+        }
+
+        .intro-title {
+            font-size: 5rem;
+            font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--text-light);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            animation: lightReveal 2.5s forwards ease-in-out;
+            position: relative;
+        }
+
+        @keyframes lightReveal {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+                filter: blur(10px);
+                text-shadow: 0 0 0px var(--pitch-green);
+            }
+            50% {
+                color: transparent;
+                -webkit-text-stroke: 2px var(--pitch-green);
+                filter: blur(0px);
+            }
+            100% {
+                transform: scale(1.1);
+                opacity: 1;
+                color: var(--text-light);
+                -webkit-text-stroke: 0px transparent;
+                text-shadow: 0 0 30px var(--pitch-green-glow);
+            }
+        }
+
+        /* --- 3) الخلفية المتحركة للموقع (Particles) --- */
+        .bg-glow-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0a0f0d 0%, #05140b 100%);
+        }
+
+        /* خطوط الملعب الوهمية */
+        .bg-glow-effects::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50vh;
+            border-top: 1px solid rgba(0, 255, 102, 0.05);
+            background: radial-gradient(ellipse at bottom, rgba(0, 255, 102, 0.08), transparent 70%);
+            pointer-events: none;
+        }
+
+        /* جزيئات طاقة متطايرة خفيفة */
+        .particle {
+            position: absolute;
+            background: var(--pitch-green);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: floatUp 8s infinite linear;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(105vh) scale(0.5); opacity: 0; }
+            50% { opacity: 0.4; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        /* --- 4) قسم واجهة البطل (Hero Section) --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .hero-main-title {
+            font-size: 7rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--text-light);
+            line-height: 1;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: 1s ease forwards;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--pitch-green);
+            font-weight: 400;
+            max-width: 600px;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: 1s ease 0.3s forwards;
+        }
+
+        /* سهم التمرير للأسفل */
+        .scroll-down {
+            position: absolute;
+            bottom: 30px;
+            font-size: 1.5rem;
+            color: var(--text-gray);
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .scroll-down:hover { color: var(--pitch-green); }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* --- 5) حاوية المحتوى الرئيسي والأقسام --- */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            margin-bottom: 100px;
+        }
+
+        /* --- 6) قسم الكارد الاحترافي للصورة الشخصية --- */
+        .image-card-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .player-card {
+            width: 320px;
+            height: 420px;
+            background: linear-gradient(145deg, #0e1713, #060a08);
+            border-radius: 20px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        /* الإطار المضيء المتحرك حول الكارد */
+        .player-card::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: conic-gradient(transparent, transparent, transparent, var(--pitch-green));
+            animation: rotateBorder 6s linear infinite;
+        }
+
+        .player-card::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            background: #0d1310;
+            border-radius: 16px;
+        }
+
+        @keyframes rotateBorder {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .card-inner-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* الإطار الدائري للصورة المستقبلية */
+        .avatar-placeholder {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: #16221c;
+            border: 3px solid rgba(255,255,255,0.05);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: all 0.5s;
+            overflow: hidden;
+        }
+
+        /* تأثير التوهج الخلفي للصورة */
+        .avatar-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, var(--pitch-green-glow) 0%, transparent 70%);
+            opacity: 0.5;
+            transition: opacity 0.5s;
+        }
+
+        .avatar-placeholder i {
+            font-size: 4rem;
+            color: var(--text-gray);
+            position: relative;
+            z-index: 2;
+            transition: color 0.3s;
+        }
+
+        /* نصوص داخل الكارد */
+        .card-player-name {
+            margin-top: 25px;
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: var(--text-light);
+        }
+
+        .card-player-tag {
+            color: var(--pitch-green);
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: rgba(0, 255, 102, 0.1);
+            padding: 4px 15px;
+            border-radius: 20px;
+            margin-top: 8px;
+        }
+
+        /* تأثيرات الـ Hover للتفاعل مع الكارد */
+        .player-card:hover {
+            transform: scale(1.04) translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 255, 102, 0.15);
+        }
+
+        .player-card:hover .avatar-placeholder {
+            border-color: var(--pitch-green);
+            box-shadow: 0 0 30px var(--pitch-green-glow);
+        }
+
+        .player-card:hover .avatar-placeholder i {
+            color: var(--pitch-green);
+        }
+
+        /* --- 7) قسم بيانات اللاعب --- */
+        .player-info-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--pitch-green);
+            border-radius: 2px;
+        }
+
+        .info-cards-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-right: 4px solid var(--pitch-green);
+            padding: 20px;
+            border-radius: 4px 12px 12px 4px;
+            transition: background 0.3s;
+        }
+        .info-stat-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .info-stat-card label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            margin-bottom: 5px;
+        }
+
+        .info-stat-card span {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        /* --- 8) مهارات الفيفا المتحركة (FIFA Skills) --- */
+        .skills-section {
+            margin-bottom: 100px;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px 50px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .skill-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .skill-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .skill-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        .skill-name i {
+            margin-left: 8px;
+            color: var(--pitch-green);
+            width: 20px;
+            text-align: center;
+        }
+
+        .skill-value {
+            font-weight: 900;
+            color: var(--pitch-green);
+            font-size: 1.1rem;
+        }
+
+        .skill-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            width: 0%; /* سيتم ملؤها عبر المطور بجافا سكريبت */
+            background: linear-gradient(90deg, var(--pitch-green) 0%, #00b344 100%);
+            border-radius: 5px;
+            box-shadow: 0 0 10px var(--pitch-green-glow);
+            transition: width 1.8s cubic-bezier(0.1, 0.8, 0.3, 1);
+        }
+
+        /* --- 9) الإنجازات المستقبلية --- */
+        .achievements-section {
+            margin-bottom: 60px;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .achieve-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0) 100%);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.4s;
+        }
+
+        .achieve-card:hover {
+            border-color: rgba(0, 255, 102, 0.2);
+            transform: translateY(-5px);
+            background: linear-gradient(180deg, rgba(0, 255, 102, 0.03) 0%, rgba(0,0,0,0) 100%);
+        }
+
+        .achieve-icon {
+            font-size: 2.5rem;
+            color: rgba(255,255,255,0.1);
+            margin-bottom: 15px;
+            transition: color 0.3s;
+        }
+        .achieve-card:hover .achieve-icon {
+            color: var(--pitch-green);
+        }
+
+        .achieve-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--text-light);
+            line-height: 1.2;
+        }
+
+        .achieve-label {
+            font-size: 0.95rem;
+            color: var(--text-gray);
+            margin-top: 5px;
+        }
+
+        /* عنصر نائب للمستقبل الداكن */
+        .future-tag {
+            font-size: 0.75rem;
+            color: var(--pitch-green);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 5px;
+            opacity: 0.6;
+        }
+
+        /* --- 10) أنيميشن الظهور والتمرير (Scroll Effects) --- */
+        .reveal-element {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal-element.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- 11) التوافقية والتصميم المتجاوب (Responsive) --- */
+        @media (max-width: 992px) {
+            .hero-main-title { font-size: 5.5rem; }
+            .profile-grid { grid-template-columns: 1fr; gap: 50px; }
+            .skills-grid { grid-template-columns: 1fr; padding: 30px 20px; }
+            .achievements-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 576px) {
+            .hero-main-title { font-size: 3.8rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .intro-title { font-size: 3.2rem; }
+            .info-cards-container { grid-template-columns: 1fr; }
+            .achievements-grid { grid-template-columns: 1fr; }
+            .player-card { width: 280px; height: 380px; }
+            .avatar-placeholder { width: 150px; height: 150px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 4) شاشة انترو البداية -->
+    <div id="intro">
+        <div class="stadium-beam"></div>
+        <h1 class="intro-title">Adnan</h1>
+    </div>
+
+    <!-- 3) تأثيرات جزيئات الخلفية المضيئة المتطايرة والملاعب -->
+    <div class="bg-glow-effects" id="particles-container"></div>
+
+    <!-- 5) الصفحة الرئيسية (Hero Section) -->
+    <section class="hero" id="home">
+        <h1 class="hero-main-title" id="hero-title">Adnan</h1>
+        <p class="hero-subtitle" id="hero-sub">لاعب كرة قدم شاب وطموح يسعى للاحتراف</p>
+        <div class="scroll-down" onclick="scrollToContent()">
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- حاوية محتوى الأقسام التعريفية لللاعب -->
+    <div class="main-container" id="content-start">
+
+        <!-- 6 & 7) قسم كارد الصورة الشخصية والبيانات الشخصية -->
+        <section class="profile-grid reveal-element">
+            
+            <!-- كارد الصورة الاحترافي المتحرك -->
+            <div class="image-card-container">
+                <div class="player-card" title="سيتم وضع صورتك الرسمية هنا لاحقاً">
+                    <div class="card-inner-content">
+                        <div class="avatar-placeholder">
+                            <div class="avatar-glow"></div>
+                            <!-- أيقونة مؤقتة لحين إرسالك الصورة لاحقاً -->
+                            <i class="fa-solid fa-user-ninja"></i>
+                        </div>
+                        <h2 class="card-player-name">Adnan</h2>
+                        <span class="card-player-tag">نجم صاعد</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- لوحة معلومات اللاعب التعريفية -->
+            <div class="player-info-box">
+                <h2 class="section-title">المعلومات الشخصية</h2>
+                <div class="info-cards-container">
+                    <div class="info-stat-card">
+                        <label>الاسم الكامل</label>
+                        <span>Adnan</span>
+                    </div>
+                    <div class="info-stat-card">
+                        <label>العمر</label>
+                        <span>13 سنة</span>
+                    </div>
+                    <div class="info-stat-card">
+                        <label>المركز الأساسي</label>
+                        <span>لاعب كرة قدم</span>
+                    </div>
+                    <div class="info-stat-card" style="opacity: 0.4; border-right-color: var(--text-gray);">
+                        <label>الحالة الاحترافية</label>
+                        <span>طموح مستمر</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 8) قسم المهارات المتحرك بأسلوب FIFA -->
+        <section class="skills-section reveal-element" id="skills-sec">
+            <h2 class="section-title">قدرات اللاعب المتحركة</h2>
+            <div class="skills-grid">
+                
+                <!-- السرعة -->
+                <div class="skill-item">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-solid fa-bolt"></i> السرعة</span>
+                        <span class="skill-value">88</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-bar-fill" data-progress="88%"></div>
+                    </div>
+                </div>
+
+                <!-- المراوغة -->
+                <div class="skill-item">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-solid fa-wand-magic-sparkles"></i> المراوغة</span>
+                        <span class="skill-value">85</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-bar-fill" data-progress="85%"></div>
+                    </div>
+                </div>
+
+                <!-- التمرير -->
+                <div class="skill-item">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-solid fa-shirt"></i> التمرير</span>
+                        <span class="skill-value">82</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-bar-fill" data-progress="82%"></div>
+                    </div>
+                </div>
+
+                <!-- التسديد -->
+                <div class="skill-item">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-solid fa-bullseye"></i> التسديد</span>
+                        <span class="skill-value">80</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-bar-fill" data-progress="80%"></div>
+                    </div>
+                </div>
+
+                <!-- التحمل -->
+                <div class="skill-item">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-solid fa-heart-pulse"></i> التحمل</span>
+                        <span class="skill-value">86</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-bar-fill" data-progress="86%"></div>
+                    </div>
+                </div>
+
+                <!-- القوة -->
+                <div class="skill-item">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-solid fa-dumbbell"></i> القوة البدنية</span>
+                        <span class="skill-value">79</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-bar-fill" data-progress="79%"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 9) قسم الإنجازات (مصمم وجاهز للمستقبل) -->
+        <section class="achievements-section reveal-element">
+            <h2 class="section-title">السجل الرياضي والإنجازات</h2>
+            <div class="achievements-grid">
+                
+                <div class="achieve-card">
+                    <span class="future-tag">قريباً</span>
+                    <i class="fa-solid fa-trophy achieve-icon"></i>
+                    <div class="achieve-number">-</div>
+                    <div class="achieve-label">الجوائز والبطولات</div>
+                </div>
+
+                <div class="achieve-card">
+                    <span class="future-tag">قريباً</span>
+                    <i class="fa-solid fa-shoe-prints achieve-icon"></i>
+                    <div class="achieve-number">-</div>
+                    <div class="achieve-label">عدد المباريات الرسمية</div>
+                </div>
+
+                <div class="achieve-card">
+                    <span class="future-tag">قريباً</span>
+                    <i class="fa-solid fa-soccer-ball achieve-icon"></i>
+                    <div class="achieve-number">-</div>
+                    <div class="achieve-label">الأهداف المسجلة</div>
+                </div>
+
+                <div class="achieve-card">
+                    <span class="future-tag">قريباً</span>
+                    <i class="fa-solid fa-star achieve-icon"></i>
+                    <div class="achieve-number">-</div>
+                    <div class="achieve-label">أبرز اللحظات الكروية</div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- --- JavaScript لإدارة الأنيميشن، الجزيئات والتحكم الكامل --- -->
+    <script>
+        // 1) إخفاء شاشة الانترو الافتتاحية بعد 2.5 ثانية والانتقال الفوري
+        window.addEventListener('DOMContentLoaded', () => {
+            const intro = document.getElementById('intro');
+            const heroTitle = document.getElementById('hero-title');
+            const heroSub = document.getElementById('hero-sub');
+
+            setTimeout(() => {
+                intro.style.opacity = '0';
+                intro.style.visibility = 'hidden';
+                
+                // تشغيل تأثيرات ظهور عناصر الهيرو بعد انتهاء الانترو
+                heroTitle.style.opacity = '1';
+                heroTitle.style.transform = 'translateY(0)';
+                heroSub.style.opacity = '1';
+                heroSub.style.transform = 'translateY(0)';
+            }, 2500);
+
+            createParticles();
+        });
+
+        // سهم النزول والتحرك بسلاسة
+        function scrollToContent() {
+            document.getElementById('content-start').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 2) إنشاء تأثير الجزيئات المتطايرة في الخلفية تلقائياً
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = window.innerWidth < 576 ? 15 : 30; // تقليل العدد في الموبايل لأداء أفضل
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // قيم عشوائية لضمان حركة طبيعية
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.width = particle.style.height = Math.random() * 5 + 3 + 'px';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = Math.random() * 6 + 6 + 's';
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // 3) مراقب التمرير الذكي لتنشيط العناصر وأشرطة الفيفا عند الوصول إليها
+        const revealElements = document.querySelectorAll('.reveal-element');
+        const skillBars = document.querySelectorAll('.skill-bar-fill');
+
+        const sectionObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    
+                    // إذا كان القسم الظاهر يحتوي على أشرطة المهارات، قم بتعبئتها فوراً
+                    if (entry.target.id === 'skills-sec' || entry.target.querySelector('.skill-bar-fill')) {
+                        skillBars.forEach(bar => {
+                            bar.style.width = bar.getAttribute('data-progress');
+                        });
+                    }
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.15
+        });
+
+        revealElements.forEach(element => {
+            sectionObserver.observe(element);
+        });
+    </script>
+</body>
+</html>
